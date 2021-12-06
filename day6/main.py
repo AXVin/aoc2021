@@ -1,16 +1,19 @@
 from collections import defaultdict
 
+from utils import *
+
+
 with open("input.txt", "r") as file:
     data = file.read()
 
-data = data.split(",")
-data = list(map(int, data))
 
-
+@test(5934)
 def part1(data):
+    data = data.split(",")
+    data = list(map(int, data))
+
     new_data = []
     for i in range(80):
-        print(i)
         new_data = []
         for fish in data:
             if fish == 0:
@@ -22,8 +25,11 @@ def part1(data):
         data = new_data
     return len(data)
 
-
+@test(26984457539)
 def part2(data):
+    data = data.split(",")
+    data = list(map(int, data))
+
     fishies = defaultdict(int)
     
     for i in range(9):

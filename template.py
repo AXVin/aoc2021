@@ -1,19 +1,39 @@
 import os, sys
 
+utils_text = """
+def test(solution=None):
+    def wrapper(func):
+        def inner(data):
+            if solution is not None:
+                with open("test_input.txt", "r") as file:
+                    test_data = file.read()
+                test_result = func(test_data)
+                if test_result != solution:
+                    raise ValueError(f"{func.__name__} fails test. Output {test_result} doesn't match solution {solution}!")
+            return func(data)
+        return inner
+    return wrapper
+"""
+
 text = """
+from utils import *
+
 with open("input.txt", "r") as file:
     data = file.read()
 
-data = data.split("\\n")
-# data = list(map(int, data))
 
-
+@test()
 def part1(data):
-    pass
+    data = data.split("\\n")
+    # data = list(map(int, data))
 
 
+
+@test()
 def part2(data):
-    pass
+    data = data.split("\\n")
+    # data = list(map(int, data))
+
 
 
 print("Part 1:", part1(data))
@@ -43,9 +63,17 @@ def main():
         file.write(text)
     print(f'Created file "{dir_name}/main.py"')
 
+    with open(f"{dir_name}/utils.py", "w") as file:
+        file.write(utils_text)
+    print(f'Created file "{dir_name}/utils.py"')
+
     with open(f"{dir_name}/input.txt", "w") as file:
         file.write("")
     print(f'Created file "{dir_name}/input.txt"')
+
+    with open(f"{dir_name}/test_input.txt", "w") as file:
+        file.write("")
+    print(f'Created file "{dir_name}/test_input.txt"')
 
     print("Done!")
 
