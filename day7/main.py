@@ -14,9 +14,6 @@ def part1(data):
         fuel_used = sum(abs(crab - i) for crab in data)
         fuels.append(fuel_used)
     return min(fuels)
-    
-
-
 
 @test(168)
 def part2(data):
@@ -28,7 +25,6 @@ def part2(data):
         fuel_used = sum((abs(crab - i) * (abs(crab - i) + 1)) / 2 for crab in data)
         fuels.append(fuel_used)
     return min(fuels)
-
 
 
 print("Part 1:", "\u001b[36;1m", part1(data), "\u001b[0m")
