@@ -1,6 +1,8 @@
 import os, sys
 
-utils_text = """
+utils_text = r"""
+import time
+
 def test(solution=None):
     def wrapper(func):
         def inner(data):
@@ -10,12 +12,16 @@ def test(solution=None):
                 test_result = func(test_data)
                 if test_result != solution:
                     raise ValueError(f"{func.__name__} fails test. Output {test_result} doesn't match solution {solution}!")
-            return func(data)
+            start = time.time()
+            ret = func(data)
+            end = time.time()
+            print("\u001b[38;5;244m", f"[{func.__name__} took {round(end-start, 5)}s]", "\u001b[0m")
+            return ret
         return inner
     return wrapper
 """
 
-text = """
+text = r"""
 from utils import *
 
 with open("input.txt", "r") as file:
@@ -24,20 +30,20 @@ with open("input.txt", "r") as file:
 
 @test()
 def part1(data):
-    data = data.split("\\n")
+    data = data.split("\n")
     # data = list(map(int, data))
 
 
 
 @test()
 def part2(data):
-    data = data.split("\\n")
+    data = data.split("\n")
     # data = list(map(int, data))
 
 
 
-print("Part 1:", part1(data))
-print("Part 2:", part2(data))
+print("Part 1:", "\u001b[36;1m", part1(data), "\u001b[0m")
+print("Part 2:", "\u001b[36;1m", part2(data), "\u001b[0m")
 """
 
 def main():
