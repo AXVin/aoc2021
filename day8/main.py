@@ -40,6 +40,38 @@ segments = {
     9: [0,1,2,3,5,6]
 }
 
+@test(61229)
+def part2_permutations(data):
+    from itertools import permutations
+    data = data.strip().split("\n")
+    letters = 'abcdefg'
+    sum_ = 0
+    for line in data:
+        left, right = line.split(" | ")
+        left_digits, right_digits = left.split(" "), right.split(" ")
+        perm_segments = {}
+        for perm in permutations(letters):
+            perm_segments = [set(perm[j] for j in segment) for segment in segments.values()]
+            fits = 0
+            for digit in left_digits:
+                digit = set(sorted(digit))
+                for segment in perm_segments:
+                    if len(digit) == len(segment):
+                        if len(digit-segment) == 0:
+                            fits += 1
+                            break
+            if fits == len(left_digits):
+                break
+        number = ""
+        for digit in right_digits:
+            digit = set(sorted(digit))
+            for i, segment in enumerate(perm_segments):
+                if len(digit) == len(segment):
+                    if len(digit-segment) == 0:
+                        number += str(i)
+                        break
+        sum_ += int(number)
+    return sum_
 
 @test(61229)
 def part2(data):
