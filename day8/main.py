@@ -52,19 +52,24 @@ def part2_permutations(data):
         perm_segments = {}
         for perm in permutations(letters):
             perm_segments = [set(perm[j] for j in segment) for segment in segments.values()]
-            fits = 0
+            fits_number = 0
             for digit in left_digits:
-                digit = set(sorted(digit))
+                digit = set(digit)
+                fits = False
                 for segment in perm_segments:
                     if len(digit) == len(segment):
                         if len(digit-segment) == 0:
-                            fits += 1
+                            fits = True
                             break
-            if fits == len(left_digits):
+                if fits:
+                    fits_number += 1
+                else:
+                    break
+            if fits_number == len(left_digits):
                 break
         number = ""
         for digit in right_digits:
-            digit = set(sorted(digit))
+            digit = set(digit)
             for i, segment in enumerate(perm_segments):
                 if len(digit) == len(segment):
                     if len(digit-segment) == 0:
