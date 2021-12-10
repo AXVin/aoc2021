@@ -10,6 +10,7 @@ pairs = {
     "[": "]",
     "<": ">"
 }
+pairs_rev =  {v:k for k, v in pairs.items()}
 scores = {
     ")": 3,
     "]":  57,
@@ -23,31 +24,49 @@ def part1(data):
     # data = list(map(int, data))
     summ = 0
     for line in data:
-        chars_done = []
-        for i, char in enumerate(list(line)):
-            if i in chars_done:
-                continue
-            if char in pairs.values():
-                print(scores[char], line.count(char))
-                summ += scores[char] * line.count(char)
-                break
-            chars_done.append(i)
-            
-            closing = pairs[char]
-            x = [(i, char) for i, char in enumerate(list(line)) if i not in chars_done and char == closing]
-            if x:
-                chars_done.append(x[0][0])
+        openings = []
+        for char in line:
+            if char in pairs:
+                openings.append(char)
             else:
-                break
-
+                if openings.pop() != pairs_rev[char]:
+                    summ += scores[char]
+                    break
     return summ
 
-@test()
+scores_map = {
+    ')': 1,
+    ']': 2,
+    '}': 3,
+    '>': 4
+}
+
+
+@test(288957)
 def part2(data):
     data = data.strip().split("\n")
     # data = list(map(int, data))
+    scores = []
+    for line in data:
+        openings = []
+        for char in line:
+            if char in pairs:
+                openings.append(char)
+            else:
+                if openings.pop() != pairs_rev[char]:
+                    break
+        else:
+            summ = 0
+            for opening in openings:
+                summ *= 5
+                summ += scores_map[pairs[opening]]
+            scores.append(summ)
+
+    import statistics
+    return statistics.median(scores)
 
 
 
-print("Part 1:", "\u001b[36;1m", part1(data), "\u001b[0m")
+
+# print("Part 1:", "\u001b[36;1m", part1(data), "\u001b[0m")
 print("Part 2:", "\u001b[36;1m", part2(data), "\u001b[0m")
