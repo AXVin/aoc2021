@@ -53,6 +53,8 @@ def part2(data):
                 basin = 0
                 while points_to_be_done:
                     i, j = points_to_be_done.pop()
+                    if data[i][j] == "9":
+                        continue
                     if i > 0:
                         if data[i-1][j] != "9" and (i-1, j) not in points_done:
                             basin += 1
