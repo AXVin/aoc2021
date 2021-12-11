@@ -57,7 +57,7 @@ def part2(data):
                     break
         else:
             summ = 0
-            for opening in openings:
+            for opening in openings[::-1]:
                 summ *= 5
                 summ += scores_map[pairs[opening]]
             scores.append(summ)

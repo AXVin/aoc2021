@@ -30,14 +30,14 @@ with open("input.txt", "r") as file:
 
 @test()
 def part1(data):
-    data = data.split("\n")
+    data = data.strip().split("\n")
     # data = list(map(int, data))
 
 
 
 @test()
 def part2(data):
-    data = data.split("\n")
+    data = data.strip().split("\n")
     # data = list(map(int, data))
 
 
