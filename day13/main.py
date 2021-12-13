@@ -15,25 +15,34 @@ def part1(data):
         points[(int(x), int(y))] = 1
 
     for instruction in instructions.split("\n"):
-        max_x = max(points, key=lambda x: x[0])[0]
-        max_y = max(points, key=lambda x: x[1])[1]
+        max_x = max(points, key=lambda x: x[0])[0] + 1
+        max_y = max(points, key=lambda x: x[1])[1] + 1
 
         instruction = instruction.strip()
         axis, i = instruction[-3], instruction[-1]
         i = int(i)
         if axis == "x":
-            for a, b in zip(range(i, 0, -1), range(i, max_x)):
+            for a, b in zip(range(i, -1, -1), range(i, max_x)):
                 for y in range(max_y):
                     points[(a, y)] += points[(b, y)]
                     del points[(b, y)]
         else:
-            for a, b in zip(range(i, 0, -1), range(i, max_y)):
+            for a, b in zip(range(i, -1, -1), range(i, max_y)):
                 for x in range(max_x):
                     points[(x, a)] += points[(x, b)]
                     del points[(x, b)]
         break
 
-    return(sum(1 for value in points.values() if value))
+    ret = ""
+    max_x = max(points, key=lambda x: x[0])[0] + 1
+    max_y = max(points, key=lambda x: x[1])[1] + 1
+    for y in range(max_y):
+        for x in range(max_x):
+            ret += '#' if points[(x, y)] else '.'
+        ret += "\n"
+    # if max_y < 20:
+    print(ret)
+    return sum(1 for value in points.values() if value)
 
 
 
