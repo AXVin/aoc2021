@@ -33,6 +33,7 @@ def part1(data):
         char: template.count(char)
         for char in template
     }
+    print({a+b: template.count(a+b) for a, b in zip(template, template[1:])})
     return count[max(count, key=lambda x: count[x])] - count[min(count, key=lambda x: count[x])]
 
 
@@ -45,13 +46,11 @@ def part2(data):
         join, insert = line.strip().split(' -> ')
         instructions[join] = (join[0] + insert, insert + join[1])
 
-    print(instructions)
     template = defaultdict(int)
     for a, b in zip(template_str.strip(), template_str.strip()[1:]):
         template[a+b] += 1
     template = dict(template)
     for step in range(40):
-        print(template)
         new_template = defaultdict(int)
         for key, value in template.items():
             if key in instructions:
@@ -62,12 +61,11 @@ def part2(data):
                 new_template[key] = value
         template = dict(new_template)
 
-    values = [x[1] for x in instructions.values()]
+    print(template)
     counts = defaultdict(int)
     for key, value in template.items():
         counts[key[0]] += value
-        if key in values:
-            counts[key[1]] += 1
+    counts[template_str.strip()[-1]] += 1
 
     sorts = sorted(counts, key=lambda x: counts[x])
     print(sorts[-1], counts[sorts[-1]], sorts[0], counts[sorts[0]])
