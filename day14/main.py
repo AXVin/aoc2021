@@ -50,26 +50,24 @@ def part2(data):
     for a, b in zip(template_str.strip(), template_str.strip()[1:]):
         template[a+b] += 1
     template = dict(template)
-    for step in range(4):
+    for step in range(40):
         print(template)
         new_template = defaultdict(int)
-        for key in template:
+        for key, value in template.items():
             if key in instructions:
                 keys = instructions[key]
                 for key in keys:
-                    try:
-                        value = template[key]
-                    except KeyError:
-                        value = 1
                     new_template[key] += value
             else:
-                new_template[key] = template[key]
+                new_template[key] = value
         template = dict(new_template)
 
+    values = [x[1] for x in instructions.values()]
     counts = defaultdict(int)
     for key, value in template.items():
         counts[key[0]] += value
-        counts[key[1]] += 1
+        if key in values:
+            counts[key[1]] += 1
 
     sorts = sorted(counts, key=lambda x: counts[x])
     print(sorts[-1], counts[sorts[-1]], sorts[0], counts[sorts[0]])
