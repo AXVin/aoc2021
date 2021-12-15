@@ -25,6 +25,8 @@ class Node:
         self.value =  value
         self.x = x
         self.y = y
+        self.parent: Optional[Node] = None
+        self.cost = float('inf')
 
     def __repr__(self):
         return f"<Node value={self.value} position=({self.x}, {self.y})>"
@@ -74,8 +76,10 @@ class Grid(Mapping):
         except IndexError:
             raise KeyError
 
-    def __iter__(self) -> Iterator[Node]:
-        return iter(self.nodes)
+    def __iter__(self) -> Iterator[Point]:
+        for y in range(self.height):
+            for x in range(self.width):
+                yield (x, y)
 
     def __len__(self):
         return len(self.nodes)
@@ -104,7 +108,7 @@ class Grid(Mapping):
 
     @staticmethod
     def distance(a: Node, b: Node) -> float:
-        return abs(a.x-b.x) + abs(a.y-b.y)
+        return math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)
 
     def traversable(self, node: Node) -> bool:
         return node.value != '#'
@@ -133,7 +137,7 @@ class Grid(Mapping):
                     elif node in to_visit:
                         node = f"\u001b[38;5;118m{node.value}\u001b[0m"
                     else:
-                        node = node.value
+                        node = str(node.value)
                     ret += node
                 ret += "\n"
             print("\033[2J")
@@ -149,9 +153,9 @@ class Grid(Mapping):
                     continue
                 if node in already_visited:
                     continue
-                g_cost = self.distance(visiting, node)
-                h_cost = self.distance(goal, node)
-                cost = g_cost + h_cost
+                g_cost = self.distance(visiting, node) + visiting.value
+                h_cost = self.distance(goal, node) + goal.value
+                cost = g_cost + h_cost + node.value
                 old_node = to_visit.get(node)
                 if old_node and old_node[1] < cost:
                     continue
@@ -177,13 +181,12 @@ class Grid(Mapping):
         Returns the shortest path from start to goal using Dijkstra* algorithm
         '''
         # first is the node it came from, second is its G+H cost
-        already_visited: dict[Node, tuple[Node, float]] = {
-            start: (None, 0)
-        }
-        to_visit: dict[Node, tuple[Node, float]] = {
-            start: (None, 0)
-        }
-        path = []
+        explored: set[Node] = set()
+        unexplored: set[Node] = set()
+        path: list[Node] = []
+        start.parent = None
+        start.cost = 0
+        unexplored.add(start)
         def debug():
             ret = ""
             for y in range(self.height):
@@ -191,9 +194,9 @@ class Grid(Mapping):
                     node = self[(x, y)]
                     if node in path:
                         node = f"\u001b[38;5;69m{node.value}\u001b[0m"
-                    elif node in already_visited:
+                    elif node in explored:
                         node = f"\u001b[38;5;196m{node.value}\u001b[0m"
-                    elif node in to_visit:
+                    elif node in unexplored:
                         node = f"\u001b[38;5;118m{node.value}\u001b[0m"
                     else:
                         node = node.value
@@ -203,36 +206,31 @@ class Grid(Mapping):
             print(ret)
             time.sleep(0.25)
 
-        visiting = start
-        while to_visit:
-            debug()
-            nodes = self.cardinals(visiting)
-            for node in nodes:
-                if not self.traversable(node):
-                    continue
-                if node in already_visited:
-                    continue
-                g_cost = node.value + visiting.value
-                # h_cost = self.distance(goal, node)
-                cost = g_cost # + h_cost
-                old_node = to_visit.get(node)
-                if old_node and old_node[1] < cost:
-                    continue
-                to_visit[node] = (visiting, cost)
-            visiting = min(to_visit, key=lambda x: to_visit[x][1])
-            already_visited[visiting] = to_visit[visiting]
-            del to_visit[visiting]
+        while unexplored:
+            # debug()
+            visiting = min(unexplored, key=lambda x: x.cost)
             if visiting == goal:
                 path.append(visiting)
                 node = visiting
                 while True:
-                    node = already_visited[node][0]
+                    node = node.parent
                     if node is None:
                         break
                     path.append(node)
-                    debug()
+                    # debug()
                 return list(reversed(path))
-        return path
+            explored.add(visiting)
+            unexplored.remove(visiting)
+            nodes = self.cardinals(visiting)
+            for node in nodes:
+                if node in explored:
+                    continue
+                cost = node.value + visiting.cost
+                if node.cost < cost:
+                    continue
+                node.cost = cost
+                node.parent = visiting
+                unexplored.add(node)
 
 
 
