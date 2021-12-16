@@ -34,7 +34,7 @@ class Operator(NamedTuple):
         elif self.type == 7:
             value = bool(self.subs[0].value == self.subs[1].value)
         return value
-            
+
 
 def parse_literal(data):
     total_bits = ''
@@ -46,7 +46,6 @@ def parse_literal(data):
             break
         i += 1
     return int(total_bits, 2), i
-
 
 def parse(data):
     if len(data) < 8:
@@ -91,17 +90,9 @@ def part1(data):
 
 @test()
 def part2(data):
-    f = data
     data = ''.join([bin(int(x.strip(), 16))[2:].zfill(4) for x in data.strip()])
-    f += '\n' + data
     tokens = parse(data)
-    # print(tokens)
-    f += '\n' + repr(tokens)
-    with open('test', 'w') as file:
-        file.write(f)
     return tokens[0].value
-
-
 
 
 print("Part 1:", "\u001b[36;1m", part1(data), "\u001b[0m")
