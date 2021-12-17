@@ -56,7 +56,7 @@ def parse(data):
     if packet_type == 4:
         literal, i = parse_literal(data[6:])
         parsed.append(Literal(version=version, value=literal))
-        parsed.extend(parse(data[6+(i+1)*5:]))
+        to_extend = parse(data[6+(i+1)*5:])
     else:
         subs = []
         length_type = data[6]
@@ -65,13 +65,13 @@ def parse(data):
         if length_type == 15:
             subpackets = data[7+length_type:7+length_type+length]
             subs.extend(parse(subpackets))
-            parsed.append(Operator(version=version, type=packet_type, subs=subs))
-            parsed.extend(parse(data[7+length_type+length:]))
+            to_extend = parse(data[7+length_type+length:])
         else:
-            stuff = parse(data[7+length_type:])
-            subs.extend(stuff[:length])
-            parsed.append(Operator(version=version, type=packet_type, subs=subs))
-            parsed.extend(stuff[length:])
+            packets = parse(data[7+length_type:])
+            subs.extend(packets[:length])
+            to_extend = packets[length:]
+        parsed.append(Operator(version=version, type=packet_type, subs=subs))
+    parsed.extend(to_extend)
     return parsed
 
 def version_sum(tokens):
