@@ -1,4 +1,5 @@
 from __future__ import annotations
+import itertools
 
 import math
 from typing import List, Optional, Union
@@ -16,8 +17,9 @@ def split(number):
 Data = List[Union[int, str]]
 
 def reduce(data: Data) -> Data:
+    can_split = False
     while True:
-        # time.sleep(.5)
+        # time.sleep(1)
         # print("".join(map(str, data)))
 
         depth = 0
@@ -31,13 +33,7 @@ def reduce(data: Data) -> Data:
                     depth -= 1
                 new_data.append(char)
             else:
-                if char > 9:
-                    # split just in case
-                    new_data.extend(split(char))
-                    new_data.extend(data[i+1:])
-                    data = new_data
-                    break
-                if depth > 4 and isinstance(data[i+2], int):
+                if depth > 4: # and isinstance(data[i+2], int):
                     # explode
                     # pop the previously appended [
                     new_data.pop()
@@ -57,37 +53,56 @@ def reduce(data: Data) -> Data:
                             if not already_added:
                                 next_char += num2
                                 already_added = True
-                                new_data.extend(split(next_char))
-                                continue
+                                # new_data.extend(split(next_char))
+                                # continue
                         new_data.append(next_char)
                     # while finding above, add all chars to new_data
                     data = new_data
                     break
+                if char > 9 and can_split:
+                    # split just in case
+                    new_data.extend(split(char))
+                    new_data.extend(data[i+1:])
+                    data = new_data
+                    can_split = False
+                    break
                 previous_number = (i, char)
                 new_data.append(char)
         else:
-            data = new_data
-            break
+            if can_split == False:
+                can_split = True
+            else:
+                data = new_data
+                break
     return eval("".join(map(str, data)))
 
+filter_line = lambda x: list(
+    filter(
+        lambda x: x != ' ',
+        map(
+            lambda x: int(x) if x.isdigit() else x,
+            str(x)
+        )
+    )
+)
+def magnitude(data):
+    summ = 0
+    if isinstance(data, list):
+        if len(data) == 2:
+            summ += (3 * magnitude(data[0])) + (2 * magnitude(data[1]))
+        else:
+            summ += magnitude(data[0])
+    else:
+        return data
+    return summ
 
 
 @test(4140)
 def part1(data):
     data = data.strip().split("\n")
-    filter_line = lambda x: list(
-        filter(
-            lambda x: x != ' ',
-            map(
-                lambda x: int(x) if x.isdigit() else x,
-                str(x)
-            )
-        )
-    )
     data = [eval(line) for line in data]
     new_data = []
     for i, line in enumerate(data):
-        print(str(new_data))
         if i in (0, 1):
             new_data.append(line)
             if i == 1:
@@ -99,13 +114,19 @@ def part1(data):
             if i == len(data) - 1:
                 new_data = [new_data]
 
-    print("".join(map(str, new_data)))
+    return magnitude(new_data)
 
 
-@test()
+@test(3993)
 def part2(data):
     data = data.strip().split("\n")
     # data = list(map(int, data))
+    magnitudes = []
+    data = [eval(line) for line in data]
+    for line1, line2 in itertools.permutations(data, 2):
+        magnitudes.append(magnitude(reduce(filter_line([line1] + [line2]))))
+
+    return max(magnitudes)
 
 
 
