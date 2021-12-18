@@ -1,6 +1,6 @@
 from __future__ import annotations
 import itertools
-
+import functools
 import math
 from typing import List, Optional, Union
 from utils import *
@@ -96,25 +96,14 @@ def magnitude(data):
         return data
     return summ
 
+def add(a, b):
+    return reduce(filter_line([a, b]))
 
 @test(4140)
 def part1(data):
     data = data.strip().split("\n")
     data = [eval(line) for line in data]
-    new_data = []
-    for i, line in enumerate(data):
-        if i in (0, 1):
-            new_data.append(line)
-            if i == 1:
-                new_data = reduce(filter_line(new_data))
-        else:
-            new_data = [new_data]
-            new_data.append(line)
-            new_data = reduce(filter_line(new_data))
-            if i == len(data) - 1:
-                new_data = [new_data]
-
-    return magnitude(new_data)
+    return magnitude(functools.reduce(add, data))
 
 
 @test(3993)
@@ -123,9 +112,8 @@ def part2(data):
     # data = list(map(int, data))
     magnitudes = []
     data = [eval(line) for line in data]
-    for line1, line2 in itertools.permutations(data, 2):
-        magnitudes.append(magnitude(reduce(filter_line([line1] + [line2]))))
-
+    for a, b in itertools.permutations(data, 2):
+        magnitudes.append(magnitude(reduce(filter_line([a, b]))))
     return max(magnitudes)
 
 
